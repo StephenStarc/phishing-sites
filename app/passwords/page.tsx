@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 interface PasswordEntry {
   id: string;
   password: string;
+  email: string;
   site: string;
   timestamp: string;
 }

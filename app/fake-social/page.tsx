@@ -167,9 +167,9 @@ export default function FakeSocial() {
           </div>
         </div>
 
-        {/* Back to Home */}
-        <div className="text-center mt-6">
-          <Link href="/" className="text-sm text-gray-600 hover:text-gray-800">
+        {/* Back to Home - Mobile responsive positioning */}
+        <div className="fixed bottom-4 left-1/2 transform -translate-x-1/2 md:absolute md:bottom-4 md:left-auto md:right-4 md:transform-none">
+          <Link href="/" className="text-sm text-gray-600 hover:text-gray-800 bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full shadow-sm md:bg-transparent md:shadow-none md:px-0 md:py-0">
             ← Back to Phishing Awareness Demo
           </Link>
         </div>
