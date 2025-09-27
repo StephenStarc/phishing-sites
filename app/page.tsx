@@ -7,11 +7,12 @@ interface PasswordEntry {
   id: string;
   password: string;
   site: string;
-  timestamp: Date;
+  timestamp: string;
 }
 
 export default function Home() {
   const [passwords, setPasswords] = useState<PasswordEntry[]>([]);
+  const [showCount, setShowCount] = useState(false);
 
   useEffect(() => {
     // Load passwords from localStorage on component mount
@@ -22,11 +23,26 @@ export default function Home() {
         timestamp: new Date(entry.timestamp)
       }));
       setPasswords(parsedPasswords);
+      setShowCount(parsedPasswords.length > 0);
     }
   }, []);
 
   return (
     <div className="min-h-screen bg-gray-50">
+      {/* Top overlay button */}
+      <div className="fixed top-4 right-4 z-50">
+        <Link href="/passwords">
+          <button className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg shadow-lg transition-colors duration-200 font-medium flex items-center space-x-2">
+            <span>Show User Passwords</span>
+            {showCount && (
+              <span className="bg-red-500 text-white text-xs px-2 py-1 rounded-full min-w-[20px] h-5 flex items-center justify-center">
+                {passwords.length}
+              </span>
+            )}
+          </button>
+        </Link>
+      </div>
+
       <div className="w-full h-screen">
         {/* Bento Grid */}
         <div className="grid grid-cols-12 grid-rows-8 gap-3 h-full">
